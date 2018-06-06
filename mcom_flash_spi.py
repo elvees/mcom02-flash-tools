@@ -58,7 +58,8 @@ def send_ihex(tty, ihex):
 
 def split_bin_to_ihex(file_name, base_addr, max_block_size):
     """Split a binary file to the blocks and load the blocks to IntelHex
-       objects. Return the list of IntelHex objects."""
+       objects. Return the list of IntelHex objects.
+    """
     # Block size must be aligned to 2 byte boundary (workaround for rf#2088)
     assert max_block_size % 2 == 0
     ihex_list = []
