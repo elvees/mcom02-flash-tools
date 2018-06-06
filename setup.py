@@ -14,6 +14,6 @@ setup(
     scripts=['mcom_flash_mmc.py',
              'mcom_flash_spi.py'],
     install_requires=['intelhex>=2.1,<3.0',
-                      'paramiko>=2.1,<3.0',
-                      'pyserial>=2.6,<3.0'],
+                      'paramiko==2.2.1',
+                      'pyserial>=3.0,<4.0'],
 )
