@@ -11,6 +11,7 @@ import hashlib
 from paramiko import AutoAddPolicy
 from paramiko import SSHClient
 
+__version__ = '2.1.1'
 
 def write_block(ssh, device, image, block_size, md5):
     size = 0
@@ -66,7 +67,7 @@ if __name__ == '__main__':
                         help='the username to authenticate as (default: %(default)s)')
     parser.add_argument('--password', default='root',
                         help='a password to use for authentication (default: %(default)s)')
-    parser.add_argument('--version', action='version', version='%(prog)s 1.0')
+    parser.add_argument('--version', action='version', version=__version__)
 
     args = parser.parse_args()
 

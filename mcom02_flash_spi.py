@@ -16,6 +16,7 @@ import time
 from intelhex import IntelHex
 import serial
 
+__version__ = '2.1.1'
 
 def wait_new_command_line(tty, timeout=10):
     s = ""
@@ -139,7 +140,7 @@ if __name__ == "__main__":
                         help="count of data bytes to check after programming, "
                              "if not specified all the data is checked "
                              "(default: %(default)s)")
-    parser.add_argument("--version", action='version', version='%(prog)s 2.1')
+    parser.add_argument("--version", action='version', version=__version__)
     args = parser.parse_args()
 
     file_name = args.file_name
