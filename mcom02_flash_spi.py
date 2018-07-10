@@ -2,10 +2,6 @@
 
 # Copyright 2015-2016 ELVEES NeoTek JSC
 #
-# Authors:
-#     Vasiliy Zasukhin <vzasukhin@elvees.com>
-#     Alexey Kiselev <akiselev@elvees.com>
-#
 # SPDX-License-Identifier: MIT
 
 from argparse import ArgumentParser
