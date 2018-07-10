@@ -130,7 +130,7 @@ if __name__ == "__main__":
         default_port = '/dev/ttyUSB0'
 
     description = "The script to program the on-board SPI flash memory " \
-                  "with a binary file via MCom Bootrom UART terminal. " \
+                  "with a binary file via MCom-02 Bootrom UART terminal. " \
                   "The file is written starting from the zero page " \
                   "of the SPI flash memory."
     parser = ArgumentParser(description=description)

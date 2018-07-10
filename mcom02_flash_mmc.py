@@ -17,7 +17,7 @@ def write_block(ssh, device, image, block_size, md5):
     buffer_size = 512
     offset = image.tell() / 1048576
 
-    stdin, stdout, stderr = ssh.exec_command('dd of=/tmp/mcom-flash-mmc')
+    stdin, stdout, stderr = ssh.exec_command('dd of=/tmp/mcom02-flash-mmc')
     while size < block_size:
         buffer = image.read(buffer_size)
         if not buffer:
@@ -28,14 +28,14 @@ def write_block(ssh, device, image, block_size, md5):
     stdin.channel.shutdown_write()
     stdout.channel.recv_exit_status()
 
-    stdin, stdout, stderr = ssh.exec_command('dd if=/tmp/mcom-flash-mmc of=%s bs=1M seek=%d' %
+    stdin, stdout, stderr = ssh.exec_command('dd if=/tmp/mcom02-flash-mmc of=%s bs=1M seek=%d' %
                                              (device, offset))
     stdout.channel.recv_exit_status()
 
     stdin, stdout, stderr = ssh.exec_command('sync')
     stdout.channel.recv_exit_status()
 
-    stdin, stdout, stderr = ssh.exec_command('rm /tmp/mcom-flash-mmc')
+    stdin, stdout, stderr = ssh.exec_command('rm /tmp/mcom02-flash-mmc')
     stdout.channel.recv_exit_status()
 
     return size == block_size

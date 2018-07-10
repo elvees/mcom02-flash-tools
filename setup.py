@@ -8,11 +8,11 @@
 from setuptools import setup
 
 setup(
-    name='mcom_flash_tools',
+    name='mcom02_flash_tools',
     version='1.0',
-    description='MCom flash tools',
-    scripts=['mcom_flash_mmc.py',
-             'mcom_flash_spi.py'],
+    description='MCom-02 based PCB flashing tools',
+    scripts=['mcom02_flash_mmc.py',
+             'mcom02_flash_spi.py'],
     install_requires=['intelhex>=2.1,<3.0',
                       'paramiko==2.2.1',
                       'pyserial>=3.0,<4.0'],
