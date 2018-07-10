@@ -1,7 +1,8 @@
 #!/usr/bin/env python2
 
 # Copyright 2015-2016 ELVEES NeoTek JSC
-#
+# Copyright 2017-2018 RnD Center "ELVEES", JSC
+
 # SPDX-License-Identifier: MIT
 
 from argparse import ArgumentParser

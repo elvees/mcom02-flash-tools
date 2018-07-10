@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 #
-# Copyright 2017 RnD Center "ELVEES", JSC
+# Copyright 2017-2018 RnD Center "ELVEES", JSC
 #
 # SPDX-License-Identifier: MIT
 #
