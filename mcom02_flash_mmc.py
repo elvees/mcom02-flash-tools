@@ -51,7 +51,7 @@ def verify_image(ssh, device, image_size, md5):
 if __name__ == '__main__':
     description = 'The script to write a binary image to the MMC device via SSH.'
 
-    parser = ArgumentParser(description=description, prog='mcom_flash_mmc')
+    parser = ArgumentParser(description=description)
     parser.add_argument('hostname',
                         help='the server to connect to')
     parser.add_argument('device',
