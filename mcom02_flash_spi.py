@@ -6,7 +6,7 @@
 #     Vasiliy Zasukhin <vzasukhin@elvees.com>
 #     Alexey Kiselev <akiselev@elvees.com>
 #
-# SPDX-License-Identifier:	GPL-2.0+
+# SPDX-License-Identifier: MIT
 
 from argparse import ArgumentParser
 import os
