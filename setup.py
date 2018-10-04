@@ -11,6 +11,7 @@ setup(
     name='mcom02_flash_tools',
     version='2.1.1',
     description='MCom-02 based PCB flashing tools',
+    python_requires='~=2.7',
     scripts=['mcom02_flash_mmc.py',
              'mcom02_flash_spi.py'],
     install_requires=['intelhex>=2.1,<3.0',
