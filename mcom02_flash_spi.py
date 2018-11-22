@@ -16,7 +16,7 @@ import time
 from intelhex import IntelHex
 import serial
 
-__version__ = '2.1.1'
+__version__ = '2.2.0'
 
 def wait_new_command_line(tty, timeout=10):
     s = ""

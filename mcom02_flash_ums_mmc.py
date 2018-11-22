@@ -14,7 +14,7 @@ import time
 
 import serial
 
-__version__ = '2.1.1'
+__version__ = '2.2.0'
 
 exp_str_timeout = 10
 usb_device_init_delay = 5

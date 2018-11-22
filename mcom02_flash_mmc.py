@@ -11,7 +11,7 @@ import hashlib
 from paramiko import AutoAddPolicy
 from paramiko import SSHClient
 
-__version__ = '2.1.1'
+__version__ = '2.2.0'
 
 def write_block(ssh, device, image, block_size, md5):
     size = 0

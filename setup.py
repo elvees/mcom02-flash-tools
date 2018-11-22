@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name='mcom02_flash_tools',
-    version='2.1.1',
+    version='2.2.0',
     description='MCom-02 based PCB flashing tools',
     python_requires='~=2.7',
     scripts=['mcom02_flash_mmc.py',
