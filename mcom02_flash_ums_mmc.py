@@ -112,7 +112,8 @@ if __name__ == '__main__':
         eprint('Error: U-Boot terminal does not respond. Set the boot mode to SPI '
                'and reset the board power (do not use warm reset).')
         sys.exit(1)
-    run_command(tty, 'a', args.prompt)  # hitting key to stop autoboot
+    tty.write('a')  # hitting key to stop autoboot
+    wait_for_string(tty, args.prompt)
 
     uboot_version = get_uboot_version(tty, args.prompt)
     if uboot_version is not None:
