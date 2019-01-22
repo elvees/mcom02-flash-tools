@@ -59,9 +59,6 @@ def send_ihex(tty, ihex):
     if res is None:
         print "Error: the device does not respond on writing a file."
         sys.exit(1)
-    tmp = wait_new_command_line(tty)
-    if tmp is not None:
-        res += tmp
     return res
 
 
