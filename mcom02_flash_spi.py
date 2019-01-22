@@ -95,7 +95,8 @@ def write_bin_to_flash(tty, file_name):
 
 
 def dump2bytes(list_string):
-    # TODO(vzasukhin): explain
+    # BootROM rev.0 prints additional string "Config spi0... Ok" before data
+    # so we have to filter this string out
     if not list_string[0].startswith("0x"):
         list_string = list_string[1:]
 
