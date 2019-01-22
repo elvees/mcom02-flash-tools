@@ -32,6 +32,9 @@ def wait_new_command_line(tty, timeout=10):
 def send_cmd(tty, cmd):
     tty.write(cmd + "\n")
     res = wait_new_command_line(tty)
+    if res is None:
+        print "Error: the device does not respond on {}".format(cmd)
+        sys.exit(1)
     if res.strip() == '#':
         print "Error: BootROM received empty response"
         sys.exit(1)
@@ -40,9 +43,6 @@ def send_cmd(tty, cmd):
         sys.exit(1)
     if cmd not in res:
         print "Error: BootROM received incorrect command arguments:\n{}".format(res)
-        sys.exit(1)
-    if res is None:
-        print "Error: the device does not respond on {}".format(cmd)
         sys.exit(1)
     tty.flush()
     return res
