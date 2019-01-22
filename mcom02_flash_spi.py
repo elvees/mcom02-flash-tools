@@ -23,9 +23,11 @@ def wait_new_command_line(tty, timeout=10):
     time_stop = time.time() + timeout
     while not s.endswith("\r#"):
         char = tty.read()
-        if (not char) or (time.time() > time_stop):
+        if time.time() > time_stop:
             return None
-        s += char
+        if char:
+            s += char
+
     return s
 
 
@@ -158,7 +160,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
-        tty = serial.Serial(port=args.port, baudrate=115200, timeout=2)
+        tty = serial.Serial(port=args.port, baudrate=115200, timeout=0.5)
     except serial.SerialException:
         print "Error: cannot open the device '%s'." % args.port
         sys.exit(1)
