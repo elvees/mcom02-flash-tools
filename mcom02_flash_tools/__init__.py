@@ -2,6 +2,7 @@
 
 from __future__ import print_function
 import sys
+import time
 
 import monotonic
 import serial
@@ -155,3 +156,21 @@ class UART(object):
             return [x.strip() for x in version.split('\n') if x.startswith('U-Boot')][0]
         except Exception:
             return None
+
+    def wait_for_uboot(self, timeout=None, show_status=True):
+        if show_status:
+            print('Waiting for U-Boot prompt...')
+        self.tty.write('\x03')  # send Ctrl-C for new prompt if U-Boot is already loaded
+
+        success, resp = self.wait_for_string(['Hit any key to stop autoboot:', self.prompt],
+                                             timeout=timeout)
+        if not success:
+            return False
+        elif resp.endswith(self.prompt):  # If U-Boot already loaded then do not need any actions
+            return True
+
+        time.sleep(0.01)  # wait for complete U-Boot message output
+        self.tty.write('\x03')  # send Ctrl-C to interrupt autoboot
+        self.wait_for_string(self.prompt)  # wait for prompt
+
+        return True
