@@ -11,29 +11,16 @@ import platform
 from StringIO import StringIO
 import struct
 import sys
-import time
 
 from intelhex import IntelHex
-import serial
+from serial import SerialException
+
+from mcom02_flash_tools import UART
 
 __version__ = '2.2.0'
 
-def wait_new_command_line(tty, timeout=10):
-    s = ""
-    time_stop = time.time() + timeout
-    while not s.endswith("\r#"):
-        char = tty.read()
-        if time.time() > time_stop:
-            return None
-        if char:
-            s += char
-
-    return s
-
-
 def send_cmd(tty, cmd):
-    tty.write(cmd + "\n")
-    res = wait_new_command_line(tty)
+    res = tty.run(cmd, timeout=10, strip_echo=False)
     if res is None:
         print "Error: the device does not respond on {}".format(cmd)
         sys.exit(1)
@@ -46,7 +33,6 @@ def send_cmd(tty, cmd):
     if cmd not in res:
         print "Error: BootROM received incorrect command arguments:\n{}".format(res)
         sys.exit(1)
-    tty.flush()
     return res
 
 
@@ -54,8 +40,7 @@ def send_ihex(tty, ihex):
     sio = StringIO()
     ihex.write_hex_file(sio)
     sio.seek(0)
-    tty.write(sio.read())
-    res = wait_new_command_line(tty)
+    res = tty.run(sio.read().strip())
     if res is None:
         print "Error: the device does not respond on writing a file."
         sys.exit(1)
@@ -110,7 +95,7 @@ def dump2bytes(list_string):
 def check_block(tty, data, offset, size):
     dump_count = int((size + 3) / 4)
     dump = send_cmd(tty, "dumpspiflash {:x} {:x}".format(offset, dump_count))
-    received = dump2bytes(dump.split("\n\r")[2:][:-1])
+    received = dump2bytes(dump.split("\n")[2:][:-1])
     return received[:size] == data[offset:][:size]
 
 
@@ -158,13 +143,12 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
-        tty = serial.Serial(port=args.port, baudrate=115200, timeout=0.5)
-    except serial.SerialException:
+        tty = UART(prompt='\r#', port=args.port)
+    except SerialException:
         print "Error: cannot open the device '%s'." % args.port
         sys.exit(1)
 
-    tty.write("\n")
-    if wait_new_command_line(tty) is None:
+    if tty.run("") is None:
         print "Error: terminal does not respond. Set the boot mode to UART " \
               "and reset the board power (do not use warm reset)."
         sys.exit(1)
