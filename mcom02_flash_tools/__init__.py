@@ -142,15 +142,15 @@ class UART(object):
         return retcode, result
 
     def get_uboot_board_model(self, timeout=5):
-        self.tty.run("fdt addr $fdtcontroladdr", timeout=timeout)
-        model = self.tty.run("fdt list / model", timeout=timeout)
+        self.run("fdt addr $fdtcontroladdr", timeout=timeout)
+        model = self.run("fdt list / model", timeout=timeout)
         try:
             return model.split('=')[1].strip()
         except Exception:
             return None
 
     def get_uboot_version(self):
-        version = self.tty.run('version')
+        version = self.run('version')
         try:
             return [x.strip() for x in version.split('\n') if x.startswith('U-Boot')][0]
         except Exception:
