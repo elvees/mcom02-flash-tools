@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     tty = UART(prompt=args.prompt, port=args.port)
     wait_uboot = None if not args.wait_uboot else args.wait_uboot
-    ok, _ = tty.wait_for_string('Hit any key to stop autoboot', timeout=wait_uboot)
+    ok = tty.wait_for_uboot(timeout=wait_uboot)
     if not ok:
         eprint('Error: U-Boot terminal does not respond. Set the boot mode to SPI '
                'and reset the board power (do not use warm reset).')
