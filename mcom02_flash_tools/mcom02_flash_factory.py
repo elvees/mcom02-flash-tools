@@ -134,6 +134,8 @@ if __name__ == '__main__':
                         help='TTY port name')
     parser.add_argument('-s', '--spi', type=int, nargs=2, metavar=('bus', 'cs'), default=[0, 0],
                         help='SPI bus and chip select numbers of flash memory on target')
+    parser.add_argument('-t', '--timeout', type=int,
+                        help='Time in seconds to wait for U-Boot terminal, default - infinite')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='verbose mode (will show all UART transactions)')
     parser.add_argument('--version', action='version', version=__version__)
@@ -161,7 +163,11 @@ if __name__ == '__main__':
         sys.exit(1)
 
     show_waiting_status = args.command != 'print' or not args.json
-    console.wait_for_uboot(show_status=show_waiting_status)
+    ok = console.wait_for_uboot(timeout=args.timeout, show_status=show_waiting_status)
+    if not ok:
+        eprint('Error: U-Boot terminal does not respond. Set the boot mode to SPI '
+               'and reset the board power (do not use warm reset).')
+        sys.exit(1)
     command_functions = {
         'flash': cmd_flash,
         'clear': cmd_clear,
