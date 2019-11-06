@@ -57,6 +57,8 @@ if __name__ == '__main__':
     parser.add_argument('--prompt', default='mcom#',
                         help='U-Boot command line prompt')
     parser.add_argument('--version', action='version', version=__version__)
+    parser.add_argument('--status', action='store_true',
+                        help='show progress of dd utility')
     args = parser.parse_args()
 
     tty = UART(prompt=args.prompt, port=args.port)
@@ -97,12 +99,14 @@ if __name__ == '__main__':
         sys.exit(1)
 
     board_usb_device = usb_devices_diff.pop()
-    print('Writing image to /dev/{}...'.format(board_usb_device))
+    print('Writing image {} to /dev/{}...'.format(args.image, board_usb_device))
+
+    cmd = ['dd', 'if={}'.format(args.image), 'of=/dev/{}'.format(board_usb_device),
+           'bs=4M', 'oflag=direct']
+    if args.status:
+        cmd.append('status=progress')
     try:
-        process = subprocess.Popen(
-            ['dd', 'if={}'.format(args.image), 'of=/dev/{}'.format(board_usb_device),
-             'bs=4M', 'oflag=direct', 'status=progress'],
-            stdout=sys.stdout, stderr=sys.stderr)
+        process = subprocess.Popen(cmd, stdout=sys.stdout, stderr=sys.stderr)
         process.communicate()
         errcode = process.returncode
     finally:  # terminate child process in case KeyboardInterrupt (Ctrl+C), etc
