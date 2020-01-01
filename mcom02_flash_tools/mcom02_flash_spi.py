@@ -21,6 +21,7 @@ from mcom02_flash_tools import UART
 
 __version__ = '2.2.0'
 
+
 def send_cmd(tty, cmd):
     res = tty.run(cmd, timeout=10, strip_echo=False)
     if res is None:
