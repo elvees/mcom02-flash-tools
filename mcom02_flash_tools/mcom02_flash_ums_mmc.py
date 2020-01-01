@@ -7,7 +7,7 @@
 
 from __future__ import print_function
 
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
+import argparse
 import subprocess
 import sys
 import time
@@ -43,8 +43,8 @@ if __name__ == '__main__':
         '(to transfer data). During the launch of the script, '
         'no third-party USB flash drives should be connected to the PC.')
 
-    parser = ArgumentParser(description=description,
-                            formatter_class=ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(description=description,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('port',
                         help='serial port the device is connected to')
     parser.add_argument('image',

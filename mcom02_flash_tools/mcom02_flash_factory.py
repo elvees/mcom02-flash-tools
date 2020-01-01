@@ -4,7 +4,7 @@
 #
 
 from __future__ import print_function
-from argparse import ArgumentDefaultsHelpFormatter, ArgumentError, ArgumentParser
+import argparse
 import json
 import sys
 
@@ -122,14 +122,15 @@ if __name__ == '__main__':
     def setting(s):
         res = s.split('=', 1)
         if len(res) != 2:
-            raise ArgumentError
+            raise argparse.ArgumentError
         return res
 
     description = 'The script to program the SPI flash memory on Salute MCom-02 boards with ' \
                   'factory settings and enable write protection for these settings. ' \
                   'Board must be flashed with U-Boot bootloader and UART0 must be ' \
                   'connected to PC. The board must be powered after the script is started.'
-    parser = ArgumentParser(description=description, formatter_class=ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(description=description,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-p', '--port', default='/dev/ttyUSB0',
                         help='TTY port name')
     parser.add_argument('-s', '--spi', type=int, nargs=2, metavar=('bus', 'cs'), default=[0, 0],
@@ -142,11 +143,11 @@ if __name__ == '__main__':
     subparsers = parser.add_subparsers(dest='command', help='commands')
     parser_flash = subparsers.add_parser('flash',
                                          help='flash factory settings into SPI flash memory',
-                                         formatter_class=ArgumentDefaultsHelpFormatter)
+                                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_flash.add_argument('setting', nargs='+', type=setting, help='settings list')
 
     parser_clear = subparsers.add_parser('clear', help='clear all factory settings',
-                                         formatter_class=ArgumentDefaultsHelpFormatter)
+                                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     for p in [parser_flash, parser_clear]:
         p.add_argument('-l', '--lock', type=int, choices=[0, 1], default=1,
                        help='if 1 then set write protection')
