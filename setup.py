@@ -10,10 +10,11 @@ from setuptools import setup
 
 setup(
     name='mcom02_flash_tools',
-    version='2.2.0',
     description='MCom-02 based PCB flashing tools',
     python_requires='~=2.7',
     packages=find_packages(),
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     scripts=['mcom02_flash_tools/mcom02_flash_factory.py',
              'mcom02_flash_tools/mcom02_flash_spi.py',
              'mcom02_flash_tools/mcom02_flash_ums_mmc.py'],

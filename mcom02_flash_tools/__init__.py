@@ -1,11 +1,17 @@
 # Copyright 2019 RnD Center "ELVEES", JSC
 
 from __future__ import print_function
+import pkg_resources
 import sys
 import time
 
 import monotonic
 import serial
+
+try:
+    __version__ = pkg_resources.get_distribution(__name__).version
+except pkg_resources.DistributionNotFound:
+    __version__ = ''  # package is not installed
 
 
 def eprint(*args, **kwargs):

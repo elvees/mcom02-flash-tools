@@ -1,3 +1,5 @@
 .tox/
+.eggs/
+*.egg
 *.egg-info
 *.pyc

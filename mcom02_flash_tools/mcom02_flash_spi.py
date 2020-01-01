@@ -16,10 +16,9 @@ import sys
 from intelhex import IntelHex
 from serial import SerialException
 
+from mcom02_flash_tools import __version__
 from mcom02_flash_tools import eprint
 from mcom02_flash_tools import UART
-
-__version__ = '2.2.0'
 
 
 def send_cmd(tty, cmd):

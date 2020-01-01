@@ -12,10 +12,10 @@ import subprocess
 import sys
 import time
 
+from mcom02_flash_tools import __version__
 from mcom02_flash_tools import eprint
 from mcom02_flash_tools import UART
 
-__version__ = '2.2.0'
 
 exp_str_timeout = 10
 usb_device_init_delay = 5

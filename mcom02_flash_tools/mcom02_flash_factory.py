@@ -12,8 +12,6 @@ import serial
 
 import mcom02_flash_tools
 
-__version__ = '2.2.0'
-
 
 def spi_probe(console, spi_bus_cs):
     console.run_with_retcode('sf probe {}:{}'.format(*spi_bus_cs),
@@ -136,7 +134,7 @@ if __name__ == '__main__':
                         help='Time in seconds to wait for U-Boot terminal, default - infinite')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='verbose mode (will show all UART transactions)')
-    parser.add_argument('--version', action='version', version=__version__)
+    parser.add_argument('--version', action='version', version=mcom02_flash_tools.__version__)
     subparsers = parser.add_subparsers(dest='command', help='commands')
     parser_flash = subparsers.add_parser('flash',
                                          help='flash factory settings into SPI flash memory',
