@@ -1,6 +1,6 @@
 #!/usr/bin/env python2
 #
-# Copyright 2019 RnD Center "ELVEES", JSC
+# Copyright 2019-2020 RnD Center "ELVEES", JSC
 #
 
 from __future__ import print_function
