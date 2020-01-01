@@ -5,6 +5,7 @@
 
 # SPDX-License-Identifier: MIT
 
+from __future__ import print_function
 from argparse import ArgumentParser
 import os
 import platform
@@ -15,6 +16,7 @@ import sys
 from intelhex import IntelHex
 from serial import SerialException
 
+from mcom02_flash_tools import eprint
 from mcom02_flash_tools import UART
 
 __version__ = '2.2.0'
@@ -22,16 +24,16 @@ __version__ = '2.2.0'
 def send_cmd(tty, cmd):
     res = tty.run(cmd, timeout=10, strip_echo=False)
     if res is None:
-        print "Error: the device does not respond on {}".format(cmd)
+        eprint("Device does not respond on {}".format(cmd))
         sys.exit(1)
     if res.strip() == '#':
-        print "Error: BootROM received empty response"
+        eprint("BootROM received empty response")
         sys.exit(1)
     if "Incorrect command" in res:
-        print "Error: BootROM received incorrect command:\n{}".format(res)
+        eprint("BootROM received incorrect command:\n{}".format(res))
         sys.exit(1)
     if cmd not in res:
-        print "Error: BootROM received incorrect command arguments:\n{}".format(res)
+        eprint("BootROM received incorrect command arguments:\n{}".format(res))
         sys.exit(1)
     return res
 
@@ -42,7 +44,7 @@ def send_ihex(tty, ihex):
     sio.seek(0)
     res = tty.run(sio.read().strip())
     if res is None:
-        print "Error: the device does not respond on writing a file."
+        eprint("The device does not respond on writing a file")
         sys.exit(1)
     return res
 
@@ -74,7 +76,7 @@ def write_bin_to_flash(tty, file_name):
     ihex_list = split_bin_to_ihex(file_name, base_addr, max_block_size)
     send_cmd(tty, "setflash 0")
     for i, ihex in enumerate(ihex_list):
-        print "Block: {}/{}, size: {}".format(i + 1, len(ihex_list), len(ihex))
+        print("Block: {}/{}, size: {}".format(i + 1, len(ihex_list), len(ihex)))
         send_ihex(tty, ihex)
         send_cmd(tty, "commitspiflash {:x} {:x}".format(base_addr, len(ihex)))
 
@@ -109,7 +111,7 @@ def check_file(tty, file_name, count):
     block_count = int((len(data) + max_block_size - 1) / max_block_size)
     for i, block_offset in enumerate(range(0, len(data), max_block_size)):
         block_size = min(max_block_size, len(data) - block_offset)
-        print "Block: {}/{}, size: {}".format(i + 1, block_count, block_size)
+        print("Block: {}/{}, size: {}".format(i + 1, block_count, block_size))
         if not check_block(tty, data, block_offset, block_size):
             return False
     return True
@@ -139,18 +141,18 @@ if __name__ == "__main__":
 
     file_name = args.file_name
     if not os.path.exists(file_name):
-        print "Error: the file '%s' is not found." % file_name
+        eprint("File '%s' is not found" % file_name)
         sys.exit(1)
 
     try:
         tty = UART(prompt='\r#', port=args.port)
     except SerialException:
-        print "Error: cannot open the device '%s'." % args.port
+        eprint("Failed to open device '%s'" % args.port)
         sys.exit(1)
 
     if tty.run("") is None:
-        print "Error: terminal does not respond. Set the boot mode to UART " \
-              "and reset the board power (do not use warm reset)."
+        eprint("Terminal does not respond. Set the boot mode to UART "
+               "and reset the board power (do not use warm reset)")
         sys.exit(1)
 
     # Disable DDR retention to avoid large current on DDRx_VDDQ (see rf#1160).
@@ -159,17 +161,17 @@ if __name__ == "__main__":
     send_cmd(tty, "autorun 0")
     send_cmd(tty, "cache 1")
 
-    print "Writing to flash..."
+    print("Writing to flash...")
     write_bin_to_flash(tty, file_name)
 
-    print "Checking..."
+    print("Checking...")
     checking_succeeded = check_file(tty, file_name, args.count)
 
     send_cmd(tty, "cache 0")
 
     if checking_succeeded:
-        print "Checking succeeded"
+        print("Checking succeeded")
         sys.exit(0)
     else:
-        print "Checking failed"
+        eprint("Checking failed")
         sys.exit(1)

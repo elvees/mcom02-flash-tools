@@ -14,9 +14,6 @@ import mcom02_flash_tools
 
 __version__ = '2.2.0'
 
-def eprint(*args, **kwargs):
-    print('Error:', *args, file=sys.stderr, **kwargs)
-
 
 def spi_probe(console, spi_bus_cs):
     console.run_with_retcode('sf probe {}:{}'.format(*spi_bus_cs),
@@ -160,14 +157,15 @@ if __name__ == '__main__':
     try:
         console = mcom02_flash_tools.UART(prompt='\nmcom# ', port=args.port, verbose=args.verbose)
     except serial.SerialException as e:
-        eprint(e)
+        mcom02_flash_tools.eprint(e)
         sys.exit(1)
 
     show_waiting_status = args.command != 'print' or not args.json
     ok = console.wait_for_uboot(timeout=args.timeout, show_status=show_waiting_status)
     if not ok:
-        eprint('Error: U-Boot terminal does not respond. Set the boot mode to SPI '
-               'and reset the board power (do not use warm reset).')
+        mcom02_flash_tools.eprint(
+            'U-Boot terminal does not respond. Set the boot mode to SPI '
+            'and reset the board power (do not use warm reset).')
         sys.exit(1)
     command_functions = {
         'flash': cmd_flash,

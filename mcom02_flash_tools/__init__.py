@@ -8,6 +8,10 @@ import monotonic
 import serial
 
 
+def eprint(*args, **kwargs):
+    print('Error:', *args, file=sys.stderr, **kwargs)
+
+
 class CommandError(Exception):
     pass
 
