@@ -62,7 +62,7 @@ if __name__ == '__main__':
     wait_uboot = None if not args.wait_uboot else args.wait_uboot
     ok = tty.wait_for_uboot(timeout=wait_uboot)
     if not ok:
-        eprint('Error: U-Boot terminal does not respond. Set the boot mode to SPI '
+        eprint('U-Boot terminal does not respond. Set the boot mode to SPI '
                'and reset the board power (do not use warm reset).')
         sys.exit(1)
     tty.run('')  # hitting key to stop autoboot
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     if uboot_version is not None:
         print('Found U-Boot: {}'.format(uboot_version))
     else:
-        eprint('Error: no U-Boot terminal found.')
+        eprint('No U-Boot terminal found.')
         sys.exit(1)
 
     print('Board model: ', tty.get_uboot_board_model(timeout=exp_str_timeout))
@@ -82,17 +82,17 @@ if __name__ == '__main__':
     ok, resp = tty.wait_for_string('UMS: LUN 0, dev {}'.format(args.mmcdev),
                                    timeout=exp_str_timeout)
     if not ok:
-        eprint('Error: failed to enable UMS for MMC {}. U-Boot response {}.'
+        eprint('Failed to enable UMS for MMC {}. U-Boot response {}.'
                .format(args.mmcdev, resp))
         sys.exit(1)
 
     block_device_list_after_init = get_block_devices()
     usb_devices_diff = set(block_device_list_after_init) - set(block_device_list_before_init)
     if len(usb_devices_diff) == 0:
-        eprint('Error: no USB device connections from board.')
+        eprint('No USB device connections from board.')
         sys.exit(1)
     if len(usb_devices_diff) > 1:
-        eprint('Error: too many USB device connections.')
+        eprint('Too many USB device connections.')
         sys.exit(1)
 
     board_usb_device = usb_devices_diff.pop()
@@ -113,7 +113,7 @@ if __name__ == '__main__':
             process.kill()
 
     if errcode:
-        eprint('Error: error while writing image to USB device')
+        eprint('Failed to write image to USB device')
         sys.exit(1)
 
     uboot_break(tty)
