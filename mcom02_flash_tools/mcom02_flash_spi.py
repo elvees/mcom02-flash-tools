@@ -38,6 +38,84 @@ def send_cmd(tty, cmd):
     return res
 
 
+class SPI0Controller(object):
+    """Manage SPI controller via MCom-02 BootROM terminal"""
+
+    GATE_SYS_CTR = 0x3809404c
+    CLK_SPI0_EN = 1 << 19
+    SWPORTD_CTL = 0x3803402c
+    CTRL0 = 0x38032000
+    CTRL1 = 0x38032004
+    SSIENR = 0x38032008
+    SER = 0x38032010
+    BAUDR = 0x38032014
+    TXFTLR = 0x38032018
+    RXFTLR = 0x3803201c
+    RXFLR = 0x38032024
+    DR = 0x38032060
+    SS_TOGGLE = 0x380320f4
+    FRAME_SIZE_8BIT = 0x7
+
+    def __init__(self, tty):
+        self.tty = tty
+
+    def write_reg(self, addr, val):
+        send_cmd(self.tty, "set {:#x} {:#x}".format(addr, val))
+
+    def read_reg(self, addr):
+        resp = send_cmd(self.tty, "dump {:#x} 1".format(addr))
+        resp = resp.split('\n')[2:][0]
+        return int(resp.split(' : ')[1], 0)
+
+    def __enter__(self):
+        """Enable SPI clock, setup pins to SPI mode and setup SPI controller"""
+        self.write_reg(self.GATE_SYS_CTR, self.read_reg(self.GATE_SYS_CTR) | self.CLK_SPI0_EN)
+        gpiod_ctl_value = (1 << 15) | (1 << 16) | (1 << 17) | (1 << 18)
+        self.write_reg(self.SWPORTD_CTL, self.read_reg(self.SWPORTD_CTL) | gpiod_ctl_value)
+        self.write_reg(self.SSIENR, 0)
+        self.write_reg(self.CTRL0, self.FRAME_SIZE_8BIT)
+
+        # Use very small SPI frequency (1 kHz) because SPI controller will deassert SS signal
+        # when TX FIFO will be empty. Data must pass through UART faster than through SPI.
+        self.write_reg(self.BAUDR, 24000)
+        self.write_reg(self.TXFTLR, 256)
+        self.write_reg(self.RXFTLR, 256)
+        self.write_reg(self.SS_TOGGLE, 0)
+
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Restore SPI frequency"""
+        self.write_reg(self.BAUDR, 2)  # back SPI frequency to 12 MHz
+
+    def transfer(self, send_data, receive_count):
+        """Select SS0, transmit 'send_data' and receive 'receive_count' bytes"""
+
+        def read_byte():
+            while self.read_reg(self.RXFLR) == 0:
+                pass
+            return self.read_reg(self.DR) & 0xff
+
+        self.write_reg(self.CTRL1, len(send_data) + receive_count)
+        self.write_reg(self.SSIENR, 1)
+        self.write_reg(self.SER, 0x1)
+        for b in send_data:
+            self.write_reg(self.DR, b)
+        for _ in range(receive_count):
+            self.write_reg(self.DR, 0)
+
+        for _ in send_data:
+            read_byte()
+
+        rcv_data = []
+        for _ in range(receive_count):
+            rcv_data.append(read_byte())
+
+        self.write_reg(self.SSIENR, 0)
+
+        return rcv_data
+
+
 def send_ihex(tty, ihex):
     sio = StringIO()
     ihex.write_hex_file(sio)
@@ -117,6 +195,27 @@ def check_file(tty, file_name, count):
     return True
 
 
+def unlock_write_protect(tty):
+    CMD_WRITE_STATUS_BYTE1 = 0x1
+    CMD_WRITE_DISABLE = 0x4
+    CMD_WRITE_ENABLE = 0x6
+    CMD_READ_MANUF_ID = 0x9f
+    MAN_ID_ATMEL = 0x1f
+    MAN_ID_MICRON = 0x20
+    MANUFACTURERS = {MAN_ID_ATMEL: "Atmel/Adesto", MAN_ID_MICRON: "Micron"}
+
+    with SPI0Controller(tty) as spi:
+        flash_id = spi.transfer([CMD_READ_MANUF_ID], 3)
+        man_id = flash_id[0]
+        man_str = MANUFACTURERS.get(man_id, "Unknown")
+        print("SPI Flash manufacturer: {}".format(man_str))
+        if man_id == MAN_ID_ATMEL:
+            spi.transfer([CMD_WRITE_ENABLE], 0)
+            spi.transfer([CMD_WRITE_STATUS_BYTE1, 0], 0)
+            spi.transfer([CMD_WRITE_DISABLE], 0)
+            print("Software write protect is disabled")
+
+
 if __name__ == "__main__":
     if platform.system() == 'Windows':
         default_port = 'COM3'
@@ -160,6 +259,8 @@ if __name__ == "__main__":
 
     send_cmd(tty, "autorun 0")
     send_cmd(tty, "cache 1")
+
+    unlock_write_protect(tty)
 
     print("Writing to flash...")
     write_bin_to_flash(tty, file_name)
