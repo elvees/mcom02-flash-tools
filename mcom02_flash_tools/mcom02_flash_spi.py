@@ -60,10 +60,12 @@ class SPI0Controller(object):
         self.tty = tty
 
     def write_reg(self, addr, val):
-        send_cmd(self.tty, "set {:#x} {:#x}".format(addr, val))
+        # We must not use 0x prefix for hexadecimals.
+        # See MCom-02 errata rf#1354
+        send_cmd(self.tty, "set {:x} {:x}".format(addr, val))
 
     def read_reg(self, addr):
-        resp = send_cmd(self.tty, "dump {:#x} 1".format(addr))
+        resp = send_cmd(self.tty, "dump {:x} 1".format(addr))
         resp = resp.split('\n')[2:][0]
         return int(resp.split(' : ')[1], 0)
 
