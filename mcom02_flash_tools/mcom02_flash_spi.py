@@ -1,15 +1,14 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 
 # Copyright 2015-2016 ELVEES NeoTek JSC
 # Copyright 2017-2020 RnD Center "ELVEES", JSC
 
 # SPDX-License-Identifier: MIT
 
-from __future__ import print_function
 from argparse import ArgumentParser
+from io import StringIO
 import os
 import platform
-from StringIO import StringIO
 import struct
 import sys
 

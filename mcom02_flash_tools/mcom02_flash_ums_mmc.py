@@ -1,11 +1,9 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 # Copyright 2018-2020 RnD Center "ELVEES", JSC
 #
 # SPDX-License-Identifier: MIT
 #
-
-from __future__ import print_function
 
 import argparse
 import subprocess

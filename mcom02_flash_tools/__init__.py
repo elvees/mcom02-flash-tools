@@ -1,11 +1,9 @@
 # Copyright 2019-2020 RnD Center "ELVEES", JSC
 
-from __future__ import print_function
 import pkg_resources
 import sys
 import time
 
-import monotonic
 import serial
 
 try:
@@ -73,15 +71,15 @@ class UART(object):
             return any(map(resp.endswith, expected))
 
         if timeout is not None:
-            time_end = monotonic.monotonic() + timeout
+            time_end = time.monotonic() + timeout
         else:
             time_end = sys.float_info.max
         resp = ''
-        while (monotonic.monotonic() <= time_end) and not endswith(resp, expected):
+        while (time.monotonic() <= time_end) and not endswith(resp, expected):
             ch = self.tty.read(1)
             if not ch:
                 continue
-            resp += ch
+            resp += ch.decode()
 
         result = resp.replace('\r', '')
         if self.verbose:
@@ -108,7 +106,7 @@ class UART(object):
         str
             response string
         """
-        self.tty.write('{}{}'.format(cmd, self.newline))
+        self.tty.write('{}{}'.format(cmd, self.newline).encode())
         success, resp = self.wait_for_string(self.prompt, timeout)
         if not success:
             return None
@@ -170,7 +168,7 @@ class UART(object):
     def wait_for_uboot(self, timeout=None, show_status=True):
         if show_status:
             print('Waiting for U-Boot prompt...')
-        self.tty.write('\x03')  # send Ctrl-C for new prompt if U-Boot is already loaded
+        self.tty.write(b'\x03')  # send Ctrl-C for new prompt if U-Boot is already loaded
 
         success, resp = self.wait_for_string(['Hit any key to stop autoboot:', self.prompt],
                                              timeout=timeout)
@@ -180,7 +178,7 @@ class UART(object):
             return True
 
         time.sleep(0.01)  # wait for complete U-Boot message output
-        self.tty.write('\x03')  # send Ctrl-C to interrupt autoboot
+        self.tty.write(b'\x03')  # send Ctrl-C to interrupt autoboot
         self.wait_for_string(self.prompt)  # wait for prompt
 
         return True

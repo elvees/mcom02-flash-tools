@@ -1,9 +1,8 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 #
 # Copyright 2019-2020 RnD Center "ELVEES", JSC
 #
 
-from __future__ import print_function
 import argparse
 import json
 import sys
