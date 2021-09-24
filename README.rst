@@ -156,3 +156,31 @@ __ http://dist.elvees.com/support/1892VM14YA/linux/Buildroot/v3.1/docs/html/fact
 Салют-ЭЛ24ОМ1 USB разведён в режиме хост, прошивка eMMC данной утилитой невозможна)::
 
   mcom02-flash-ums-mmc /dev/ttyUSB0 <path-to-emmc-image> --status
+
+============
+Тестирование
+============
+
+Тестирование может выполняться на модуле Салют-ЭЛ24ПМ установленном на стенде ПМ-УКФ.
+
+Для запуска тестов необходимо указать порты УИП, терминала модуля и путь к образу прошивки.
+
+Для определения портов запустить::
+
+  for k in /dev/ttyUSB*; do echo $k; uip-ctl $k status; done
+
+Скачать образ U-Boot для ПМ-УКФ и распаковать::
+
+  wget https://callisto.elvees.com/jenkins/view/MCom-02/job/mcom02-buildroot-buildroot-distrib/lastSuccessfulBuild/artifact/output/internal/mcom02-salute-el24pm2-r1.0-1.1-ukf-r1.1-uboot-v3.1.4-80-gd83fa4d-2021-09-26.img.gz
+  gunzip *.gz
+
+Установить зависимости в Python-среду::
+
+  pip3 install -r test-requirements.txt
+
+Запуск тестов::
+
+  pytest --dut-term=<dut_term> --uip-term=<uip_tty> --img=<img_file>
+
+где ``<dut_term>`` --- порт терминала модуля, ``<uip_term>`` --- порт УИП,
+``<img_file>`` --- файл с образом прошивки U-boot.

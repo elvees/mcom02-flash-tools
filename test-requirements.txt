@@ -1,0 +1,5 @@
+pytest-html>=2.1,<2.2
+pytest<6.3
+sh>=1.0,<2.0
+pyudev
+uip@git+https://gerrit.elvees.com/lib/uip
