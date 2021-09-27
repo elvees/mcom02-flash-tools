@@ -120,8 +120,7 @@ def cmd_print(console, args):
         print(resp)
 
 
-if __name__ == '__main__':
-
+def main():
     def setting(s):
         res = s.split('=', 1)
         if len(res) != 2:
@@ -209,3 +208,7 @@ if __name__ == '__main__':
         'print': cmd_print,
     }
     command_functions[args.command](console, args)
+
+
+if __name__ == '__main__':
+    main()

@@ -215,7 +215,7 @@ def unlock_write_protect(tty):
             print("Software write protect is disabled")
 
 
-if __name__ == "__main__":
+def main():
     if platform.system() == 'Windows':
         default_port = 'COM3'
     else:
@@ -287,3 +287,7 @@ if __name__ == "__main__":
     else:
         eprint("Checking failed")
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

@@ -14,10 +14,12 @@ setup(
     packages=find_packages(),
     use_scm_version=True,
     setup_requires=['setuptools_scm'],
-    scripts=[
-        'mcom02_flash_tools/mcom02_flash_factory.py',
-        'mcom02_flash_tools/mcom02_flash_spi.py',
-        'mcom02_flash_tools/mcom02_flash_ums_mmc.py',
-    ],
+    entry_points={
+        'console_scripts': [
+            'mcom02-flash-factory = mcom02_flash_tools.mcom02_flash_factory:main',
+            'mcom02-flash-spi = mcom02_flash_tools.mcom02_flash_spi:main',
+            'mcom02-flash-ums-mmc = mcom02_flash_tools.mcom02_flash_ums_mmc:main',
+        ]
+    },
     install_requires=['intelhex>=2.1,<3.0', 'pyserial>=3.0,<4.0'],
 )

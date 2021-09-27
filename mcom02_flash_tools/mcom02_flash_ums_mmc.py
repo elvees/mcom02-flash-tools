@@ -25,7 +25,7 @@ def get_block_devices():
     return out.split()[1:]
 
 
-if __name__ == '__main__':
+def main():
     description = (
         'This script writes binary images to on-board MMC memory via USB. '
         'On-board USB controller must be connected in USB Device or Device mode '
@@ -122,4 +122,8 @@ if __name__ == '__main__':
         sys.exit(1)
 
     uboot_break(tty)
-    print('Done')
+    print("Done")
+
+
+if __name__ == "__main__":
+    main()
