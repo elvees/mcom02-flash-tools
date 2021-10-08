@@ -13,17 +13,19 @@ import mcom02_flash_tools
 
 
 def spi_probe(console, spi_bus_cs):
-    console.run_with_retcode('sf probe {}:{}'.format(*spi_bus_cs),
-                             errmsg='SPI Flash probe error')
+    console.run_with_retcode('sf probe {}:{}'.format(*spi_bus_cs), errmsg='SPI Flash probe error')
 
 
 def spi_unlock(console):
-    rc, _ = console.run_with_retcode('sf protect unlock ${factoryoffset} ${factorysize}',
-                                     check=False)
+    rc, _ = console.run_with_retcode(
+        'sf protect unlock ${factoryoffset} ${factorysize}', check=False
+    )
     if rc:
-        print('Warning: Can not disable SPI Flash software write protection.\n'
-              '  Software write protection is already disabled or write protection jumper is set.\n'
-              '  If flashing will fail then check write protection jumper.')
+        print(
+            'Warning: Can not disable SPI Flash software write protection.\n'
+            '  Software write protection is already disabled or write protection jumper is set.\n'
+            '  If flashing will fail then check write protection jumper.'
+        )
 
 
 def spi_lock(console):
@@ -37,12 +39,15 @@ def cmd_flash(console, args):
         keys.append(key)
         console.run_with_retcode('setenv {} {}'.format(key, value))
 
-    console.run_with_retcode('env export -c -s ${{factorysize}} ${{loadaddr}} {}'
-                             .format(' '.join(keys)))
+    console.run_with_retcode(
+        'env export -c -s ${{factorysize}} ${{loadaddr}} {}'.format(' '.join(keys))
+    )
     spi_probe(console, args.spi)
     spi_unlock(console)
-    console.run_with_retcode('sf update ${loadaddr} ${factoryoffset} ${factorysize}',
-                             errmsg='Flashing error. Please check write protection jumper.')
+    console.run_with_retcode(
+        'sf update ${loadaddr} ${factoryoffset} ${factorysize}',
+        errmsg='Flashing error. Please check write protection jumper.',
+    )
     if args.lock:
         spi_lock(console)
     if args.verbose:
@@ -53,9 +58,10 @@ def cmd_flash(console, args):
 def cmd_clear(console, args):
     spi_probe(console, args.spi)
     spi_unlock(console)
-    console.run_with_retcode('sf erase ${factoryoffset} ${factorysize}',
-                             errmsg='Factory settings clear error. Please check write protection '
-                                    'jumper.')
+    console.run_with_retcode(
+        'sf erase ${factoryoffset} ${factorysize}',
+        errmsg='Factory settings clear error. Please check write protection ' 'jumper.',
+    )
     if args.lock:
         spi_lock(console)
     if args.verbose:
@@ -64,7 +70,6 @@ def cmd_clear(console, args):
 
 
 def cmd_print(console, args):
-
     def get_var_int(name):
         _, resp = console.run_with_retcode('env print {}'.format(name))
         _, value = resp.split('=', 1)
@@ -80,13 +85,16 @@ def cmd_print(console, args):
     env_backup_addr = loadaddr + factorysize
 
     # BUG: env export command will create incorrect buffer if used CONFIG_SYS_REDUNDAND_ENVIRONMENT
-    console.run_with_retcode('env export -c -s {:#x} {:#x}'.format(env_backup_size,
-                                                                   env_backup_addr))
+    console.run_with_retcode(
+        'env export -c -s {:#x} {:#x}'.format(env_backup_size, env_backup_addr)
+    )
     spi_probe(console, args.spi)
-    console.run_with_retcode('sf read ${loadaddr} ${factoryoffset} ${factorysize}',
-                             errmsg='Read from SPI Flash error')
-    retcode, _ = console.run_with_retcode('env import -d -c ${loadaddr} ${factorysize}',
-                                          check=False)
+    console.run_with_retcode(
+        'sf read ${loadaddr} ${factoryoffset} ${factorysize}', errmsg='Read from SPI Flash error'
+    )
+    retcode, _ = console.run_with_retcode(
+        'env import -d -c ${loadaddr} ${factorysize}', check=False
+    )
     if retcode:
         print('{}' if args.json else 'Factory settings sector is null or corrupted')
         return
@@ -94,8 +102,9 @@ def cmd_print(console, args):
     _, resp = console.run_with_retcode('env print')
 
     # restore original environment
-    console.run_with_retcode('env import -d -c {:#x} {:#x}'.format(env_backup_addr,
-                                                                   env_backup_size))
+    console.run_with_retcode(
+        'env import -d -c {:#x} {:#x}'.format(env_backup_addr, env_backup_size)
+    )
     resp = resp.split('\n\n')[0]
     if args.verbose:
         print('')
@@ -119,36 +128,65 @@ if __name__ == '__main__':
             raise argparse.ArgumentError
         return res
 
-    description = 'The script to program the SPI flash memory on Salute MCom-02 boards with ' \
-                  'factory settings and enable write protection for these settings. ' \
-                  'Board must be flashed with U-Boot bootloader and UART0 must be ' \
-                  'connected to PC. The board must be powered after the script is started.'
-    parser = argparse.ArgumentParser(description=description,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('-p', '--port', default='/dev/ttyUSB0',
-                        help='TTY port name')
-    parser.add_argument('-s', '--spi', type=int, nargs=2, metavar=('bus', 'cs'), default=[0, 0],
-                        help='SPI bus and chip select numbers of flash memory on target')
-    parser.add_argument('-t', '--timeout', type=int,
-                        help='Time in seconds to wait for U-Boot terminal, default - infinite')
-    parser.add_argument('-v', '--verbose', action='store_true',
-                        help='verbose mode (will show all UART transactions)')
+    description = (
+        'The script to program the SPI flash memory on Salute MCom-02 boards with '
+        'factory settings and enable write protection for these settings. '
+        'Board must be flashed with U-Boot bootloader and UART0 must be '
+        'connected to PC. The board must be powered after the script is started.'
+    )
+    parser = argparse.ArgumentParser(
+        description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument('-p', '--port', default='/dev/ttyUSB0', help='TTY port name')
+    parser.add_argument(
+        '-s',
+        '--spi',
+        type=int,
+        nargs=2,
+        metavar=('bus', 'cs'),
+        default=[0, 0],
+        help='SPI bus and chip select numbers of flash memory on target',
+    )
+    parser.add_argument(
+        '-t',
+        '--timeout',
+        type=int,
+        help='Time in seconds to wait for U-Boot terminal, default - infinite',
+    )
+    parser.add_argument(
+        '-v',
+        '--verbose',
+        action='store_true',
+        help='verbose mode (will show all UART transactions)',
+    )
     parser.add_argument('--version', action='version', version=mcom02_flash_tools.__version__)
     subparsers = parser.add_subparsers(dest='command', help='commands')
-    parser_flash = subparsers.add_parser('flash',
-                                         help='flash factory settings into SPI flash memory',
-                                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_flash = subparsers.add_parser(
+        'flash',
+        help='flash factory settings into SPI flash memory',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     parser_flash.add_argument('setting', nargs='+', type=setting, help='settings list')
 
-    parser_clear = subparsers.add_parser('clear', help='clear all factory settings',
-                                         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_clear = subparsers.add_parser(
+        'clear',
+        help='clear all factory settings',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
     for p in [parser_flash, parser_clear]:
-        p.add_argument('-l', '--lock', type=int, choices=[0, 1], default=1,
-                       help='if 1 then set write protection')
+        p.add_argument(
+            '-l',
+            '--lock',
+            type=int,
+            choices=[0, 1],
+            default=1,
+            help='if 1 then set write protection',
+        )
 
     parser_print = subparsers.add_parser('print', help='print currently flashed settings')
-    parser_print.add_argument('-j', '--json', action='store_true',
-                              help='output settings in JSON format')
+    parser_print.add_argument(
+        '-j', '--json', action='store_true', help='output settings in JSON format'
+    )
     args = parser.parse_args()
 
     try:
@@ -162,7 +200,8 @@ if __name__ == '__main__':
     if not ok:
         mcom02_flash_tools.eprint(
             'U-Boot terminal does not respond. Set the boot mode to SPI '
-            'and reset the board power (do not use warm reset).')
+            'and reset the board power (do not use warm reset).'
+        )
         sys.exit(1)
     command_functions = {
         'flash': cmd_flash,

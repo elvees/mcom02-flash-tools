@@ -5,19 +5,17 @@
 
 # SPDX-License-Identifier: MIT
 
-from argparse import ArgumentParser
-from io import StringIO
 import os
 import platform
 import struct
 import sys
+from argparse import ArgumentParser
+from io import StringIO
 
 from intelhex import IntelHex
 from serial import SerialException
 
-from mcom02_flash_tools import __version__
-from mcom02_flash_tools import eprint
-from mcom02_flash_tools import UART
+from mcom02_flash_tools import UART, __version__, eprint
 
 
 def send_cmd(tty, cmd):
@@ -40,19 +38,19 @@ def send_cmd(tty, cmd):
 class SPI0Controller(object):
     """Manage SPI controller via MCom-02 BootROM terminal"""
 
-    GATE_SYS_CTR = 0x3809404c
+    GATE_SYS_CTR = 0x3809404C
     CLK_SPI0_EN = 1 << 19
-    SWPORTD_CTL = 0x3803402c
+    SWPORTD_CTL = 0x3803402C
     CTRL0 = 0x38032000
     CTRL1 = 0x38032004
     SSIENR = 0x38032008
     SER = 0x38032010
     BAUDR = 0x38032014
     TXFTLR = 0x38032018
-    RXFTLR = 0x3803201c
+    RXFTLR = 0x3803201C
     RXFLR = 0x38032024
     DR = 0x38032060
-    SS_TOGGLE = 0x380320f4
+    SS_TOGGLE = 0x380320F4
     FRAME_SIZE_8BIT = 0x7
 
     def __init__(self, tty):
@@ -95,7 +93,7 @@ class SPI0Controller(object):
         def read_byte():
             while self.read_reg(self.RXFLR) == 0:
                 pass
-            return self.read_reg(self.DR) & 0xff
+            return self.read_reg(self.DR) & 0xFF
 
         self.write_reg(self.CTRL1, len(send_data) + receive_count)
         self.write_reg(self.SSIENR, 1)
@@ -130,7 +128,7 @@ def send_ihex(tty, ihex):
 
 def split_bin_to_ihex(file_name, base_addr, max_block_size):
     """Split a binary file to the blocks and load the blocks to IntelHex
-       objects. Return the list of IntelHex objects.
+    objects. Return the list of IntelHex objects.
     """
     # Block size must be aligned to 2 byte boundary (workaround for rf#2088)
     assert max_block_size % 2 == 0
@@ -200,8 +198,8 @@ def unlock_write_protect(tty):
     CMD_WRITE_STATUS_BYTE1 = 0x1
     CMD_WRITE_DISABLE = 0x4
     CMD_WRITE_ENABLE = 0x6
-    CMD_READ_MANUF_ID = 0x9f
-    MAN_ID_ATMEL = 0x1f
+    CMD_READ_MANUF_ID = 0x9F
+    MAN_ID_ATMEL = 0x1F
     MAN_ID_MICRON = 0x20
     MANUFACTURERS = {MAN_ID_ATMEL: "Atmel/Adesto", MAN_ID_MICRON: "Micron"}
 
@@ -223,19 +221,29 @@ if __name__ == "__main__":
     else:
         default_port = '/dev/ttyUSB0'
 
-    description = "The script to program the on-board SPI flash memory " \
-                  "with a binary file via MCom-02 Bootrom UART terminal. " \
-                  "The file is written starting from the zero page " \
-                  "of the SPI flash memory."
+    description = (
+        "The script to program the on-board SPI flash memory "
+        "with a binary file via MCom-02 Bootrom UART terminal. "
+        "The file is written starting from the zero page "
+        "of the SPI flash memory."
+    )
     parser = ArgumentParser(description=description)
     parser.add_argument("file_name", help="binary file for programming")
-    parser.add_argument("-p", dest="port", default=default_port,
-                        help="serial port the device is connected to "
-                             "(default: %(default)s)")
-    parser.add_argument("-c", dest="count", type=int, default=None,
-                        help="count of data bytes to check after programming, "
-                             "if not specified all the data is checked "
-                             "(default: %(default)s)")
+    parser.add_argument(
+        "-p",
+        dest="port",
+        default=default_port,
+        help="serial port the device is connected to " "(default: %(default)s)",
+    )
+    parser.add_argument(
+        "-c",
+        dest="count",
+        type=int,
+        default=None,
+        help="count of data bytes to check after programming, "
+        "if not specified all the data is checked "
+        "(default: %(default)s)",
+    )
     parser.add_argument("--version", action='version', version=__version__)
     args = parser.parse_args()
 
@@ -251,8 +259,10 @@ if __name__ == "__main__":
         sys.exit(1)
 
     if tty.run("") is None:
-        eprint("Terminal does not respond. Set the boot mode to UART "
-               "and reset the board power (do not use warm reset)")
+        eprint(
+            "Terminal does not respond. Set the boot mode to UART "
+            "and reset the board power (do not use warm reset)"
+        )
         sys.exit(1)
 
     # Disable DDR retention to avoid large current on DDRx_VDDQ (see rf#1160).

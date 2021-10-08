@@ -10,10 +10,7 @@ import subprocess
 import sys
 import time
 
-from mcom02_flash_tools import __version__
-from mcom02_flash_tools import eprint
-from mcom02_flash_tools import UART
-
+from mcom02_flash_tools import UART, __version__, eprint
 
 exp_str_timeout = 10
 usb_device_init_delay = 5
@@ -36,32 +33,37 @@ if __name__ == '__main__':
         'U-Boot for MCom-02 must be compiled with UMS support. '
         'The board must be connected to the PC via UART (for U-Boot terminal) and USB '
         '(to transfer data). During the launch of the script, '
-        'no third-party USB flash drives should be connected to the PC.')
+        'no third-party USB flash drives should be connected to the PC.'
+    )
 
-    parser = argparse.ArgumentParser(description=description,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('port',
-                        help='serial port the device is connected to')
-    parser.add_argument('image',
-                        help='a binary image for writing')
-    parser.add_argument('--mmcdev', default=0, type=int, choices=[0, 1],
-                        help='target MMC device on board')
-    parser.add_argument('--wait-uboot', default=10, type=int,
-                        dest='wait_uboot',
-                        help='time in seconds to wait for U-Boot terminal, 0 - infinite')
-    parser.add_argument('--prompt', default='mcom#',
-                        help='U-Boot command line prompt')
+    parser = argparse.ArgumentParser(
+        description=description, formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
+    parser.add_argument('port', help='serial port the device is connected to')
+    parser.add_argument('image', help='a binary image for writing')
+    parser.add_argument(
+        '--mmcdev', default=0, type=int, choices=[0, 1], help='target MMC device on board'
+    )
+    parser.add_argument(
+        '--wait-uboot',
+        default=10,
+        type=int,
+        dest='wait_uboot',
+        help='time in seconds to wait for U-Boot terminal, 0 - infinite',
+    )
+    parser.add_argument('--prompt', default='mcom#', help='U-Boot command line prompt')
     parser.add_argument('--version', action='version', version=__version__)
-    parser.add_argument('--status', action='store_true',
-                        help='show progress of dd utility')
+    parser.add_argument('--status', action='store_true', help='show progress of dd utility')
     args = parser.parse_args()
 
     tty = UART(prompt=args.prompt, port=args.port)
     wait_uboot = None if not args.wait_uboot else args.wait_uboot
     ok = tty.wait_for_uboot(timeout=wait_uboot)
     if not ok:
-        eprint('U-Boot terminal does not respond. Set the boot mode to SPI '
-               'and reset the board power (do not use warm reset).')
+        eprint(
+            'U-Boot terminal does not respond. Set the boot mode to SPI '
+            'and reset the board power (do not use warm reset).'
+        )
         sys.exit(1)
     tty.run('')  # hitting key to stop autoboot
 
@@ -77,11 +79,11 @@ if __name__ == '__main__':
     block_device_list_before_init = get_block_devices()
     tty.tty.write('ums 0 mmc {}\n'.format(args.mmcdev))
     time.sleep(usb_device_init_delay)
-    ok, resp = tty.wait_for_string('UMS: LUN 0, dev {}'.format(args.mmcdev),
-                                   timeout=exp_str_timeout)
+    ok, resp = tty.wait_for_string(
+        'UMS: LUN 0, dev {}'.format(args.mmcdev), timeout=exp_str_timeout
+    )
     if not ok:
-        eprint('Failed to enable UMS for MMC {}. U-Boot response {}.'
-               .format(args.mmcdev, resp))
+        eprint('Failed to enable UMS for MMC {}. U-Boot response {}.'.format(args.mmcdev, resp))
         sys.exit(1)
 
     block_device_list_after_init = get_block_devices()
@@ -96,8 +98,13 @@ if __name__ == '__main__':
     board_usb_device = usb_devices_diff.pop()
     print('Writing image {} to /dev/{}...'.format(args.image, board_usb_device))
 
-    cmd = ['dd', 'if={}'.format(args.image), 'of=/dev/{}'.format(board_usb_device),
-           'bs=4M', 'oflag=direct']
+    cmd = [
+        'dd',
+        'if={}'.format(args.image),
+        'of=/dev/{}'.format(board_usb_device),
+        'bs=4M',
+        'oflag=direct',
+    ]
     if args.status:
         cmd.append('status=progress')
     try:

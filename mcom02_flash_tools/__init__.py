@@ -1,9 +1,9 @@
 # Copyright 2019-2020 RnD Center "ELVEES", JSC
 
-import pkg_resources
 import sys
 import time
 
+import pkg_resources
 import serial
 
 try:
@@ -21,8 +21,7 @@ class CommandError(Exception):
 
 
 class UART(object):
-    """Class for work with UART console.
-    """
+    """Class for work with UART console."""
 
     def __init__(self, prompt, port, newline='\n', verbose=False, baudrate=115200, timeout=0.5):
         """Parameters
@@ -66,7 +65,7 @@ class UART(object):
 
         def endswith(resp, expected):
             if not isinstance(expected, (list, tuple)):
-                expected = (expected, )
+                expected = (expected,)
 
             return any(map(resp.endswith, expected))
 
@@ -112,7 +111,7 @@ class UART(object):
             return None
 
         # Return only output of command (without cmd + "\n" and command prompt)
-        return resp[len(cmd) + 1: -len(self.prompt)] if strip_echo else resp
+        return resp[len(cmd) + 1 : -len(self.prompt)] if strip_echo else resp
 
     def run_with_retcode(self, cmd, timeout=5, strip_echo=True, check=True, errmsg=None):
         """Run command and wait for prompt. Return retcode and result.
@@ -170,8 +169,9 @@ class UART(object):
             print('Waiting for U-Boot prompt...')
         self.tty.write(b'\x03')  # send Ctrl-C for new prompt if U-Boot is already loaded
 
-        success, resp = self.wait_for_string(['Hit any key to stop autoboot:', self.prompt],
-                                             timeout=timeout)
+        success, resp = self.wait_for_string(
+            ['Hit any key to stop autoboot:', self.prompt], timeout=timeout
+        )
         if not success:
             return False
         elif resp.endswith(self.prompt):  # If U-Boot already loaded then do not need any actions
