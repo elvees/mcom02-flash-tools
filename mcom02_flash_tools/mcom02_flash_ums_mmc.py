@@ -21,7 +21,9 @@ def uboot_break(tty):
 
 
 def get_block_devices():
-    out = subprocess.check_output(['lsblk', '-o', 'name', '--list', '--nodeps'])
+    out = subprocess.check_output(
+        ['lsblk', '-o', 'name', '--list', '--nodeps'], universal_newlines=True
+    )
     return out.split()[1:]
 
 
@@ -77,7 +79,7 @@ def main():
     print('Board model: ', tty.get_uboot_board_model(timeout=exp_str_timeout))
     print('Enabling USB Mass storage on target...')
     block_device_list_before_init = get_block_devices()
-    tty.tty.write('ums 0 mmc {}\n'.format(args.mmcdev))
+    tty.tty.write('ums 0 mmc {}\n'.format(args.mmcdev).encode())
     time.sleep(usb_device_init_delay)
     ok, resp = tty.wait_for_string(
         'UMS: LUN 0, dev {}'.format(args.mmcdev), timeout=exp_str_timeout
