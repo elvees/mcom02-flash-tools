@@ -15,7 +15,7 @@ Python-пакет *mcom02-flash-tools* содержит утилиты для п
 Установка
 =========
 
-Проверялось на Python 3.6 и Python 3.8. Требуются свежие версии pip, setuptools::
+Проверялось на Python 3.8. Требуются свежие версии pip, setuptools::
 
   export PATH=~/.local/bin:$PATH
   python3 -m pip install --upgrade --user pip
