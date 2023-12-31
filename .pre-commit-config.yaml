@@ -1,4 +1,17 @@
 repos:
+  # CI reports errors found by linters back to git code review systems.
+  # flake8 needs to be run before black (which reformats the code) so that flake8 errors are
+  # reported to proper lines.
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-black
+        args:
+          - --max-line-length=100
+          # Ignore E203 for black compatibility
+          - --extend-ignore=E203,BLK100
   - repo: https://github.com/psf/black-pre-commit-mirror
     rev: 23.12.1
     hooks:
@@ -18,12 +31,6 @@ repos:
     rev: v1.33.0
     hooks:
       - id: yamllint
-  - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
-    hooks:
-      - id: flake8
-        additional_dependencies:
-          - flake8-black
   - repo: https://github.com/pycqa/isort
     rev: 5.13.2
     hooks:
