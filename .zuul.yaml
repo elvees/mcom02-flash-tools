@@ -1,4 +1,9 @@
 - project:
     check:
       jobs:
+        - ecam-fct-tox:
+            files:
+              - .*\.py$
+              - ecam02_flash_tools/
+              - pyproject.toml$
         - tox

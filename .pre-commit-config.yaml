@@ -23,6 +23,7 @@ repos:
       - id: check-executables-have-shebangs
       - id: check-merge-conflict
       - id: debug-statements
+      - id: check-toml
       - id: check-yaml
       - id: end-of-file-fixer
       - id: fix-byte-order-marker
@@ -50,3 +51,8 @@ repos:
     rev: 53a24a4dec9736b5e4a625e75c3172299357cc22
     hooks:
       - id: check-copyright
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.18
+    hooks:
+      - id: validate-pyproject
+        additional_dependencies: ["validate-pyproject-schema-store[all]"]
