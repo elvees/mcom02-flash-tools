@@ -1,15 +1,16 @@
 # Copyright 2019-2020 RnD Center "ELVEES", JSC
 
+import importlib.metadata
 import sys
 import time
 
-import pkg_resources
 import serial
 
 try:
-    __version__ = pkg_resources.get_distribution(__name__).version
-except pkg_resources.DistributionNotFound:
-    __version__ = ''  # package is not installed
+    __version__ = importlib.metadata.version(__package__)
+except importlib.metadata.PackageNotFoundError:
+    # package is not installed
+    __version__ = ""
 
 
 def eprint(*args, **kwargs):
