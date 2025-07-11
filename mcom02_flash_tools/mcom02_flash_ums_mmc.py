@@ -81,9 +81,15 @@ def main():
     block_device_list_before_init = get_block_devices()
     tty.tty.write('ums 0 mmc {}\n'.format(args.mmcdev).encode())
     time.sleep(usb_device_init_delay)
+
     ok, resp = tty.wait_for_string(
-        'UMS: LUN 0, dev {}'.format(args.mmcdev), timeout=exp_str_timeout
+        [
+            f'UMS: LUN 0, dev {args.mmcdev}'.format(args.mmcdev),  # for U-Boot < 2021.04
+            f'UMS: LUN 0, dev mmc {args.mmcdev}'.format(args.mmcdev),  # for U-Boot >= 2021.04
+        ],
+        timeout=exp_str_timeout,
     )
+
     if not ok:
         eprint('Failed to enable UMS for MMC {}. U-Boot response {}.'.format(args.mmcdev, resp))
         sys.exit(1)
