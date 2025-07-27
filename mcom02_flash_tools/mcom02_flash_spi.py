@@ -153,7 +153,7 @@ def write_bin_to_flash(tty, file_name):
     ihex_list = split_bin_to_ihex(file_name, base_addr, max_block_size)
     send_cmd(tty, "setflash 0")
     for i, ihex in enumerate(ihex_list):
-        print("Block: {}/{}, size: {}".format(i + 1, len(ihex_list), len(ihex)))
+        print("Block: {}/{}, size: {}".format(i + 1, len(ihex_list), len(ihex)), flush=True)
         send_ihex(tty, ihex)
         send_cmd(tty, "commitspiflash {:x} {:x}".format(base_addr, len(ihex)))
 
@@ -188,7 +188,7 @@ def check_file(tty, file_name, count):
     block_count = int((len(data) + max_block_size - 1) / max_block_size)
     for i, block_offset in enumerate(range(0, len(data), max_block_size)):
         block_size = min(max_block_size, len(data) - block_offset)
-        print("Block: {}/{}, size: {}".format(i + 1, block_count, block_size))
+        print("Block: {}/{}, size: {}".format(i + 1, block_count, block_size), flush=True)
         if not check_block(tty, data, block_offset, block_size):
             return False
     return True
@@ -207,12 +207,12 @@ def unlock_write_protect(tty):
         flash_id = spi.transfer([CMD_READ_MANUF_ID], 3)
         man_id = flash_id[0]
         man_str = MANUFACTURERS.get(man_id, "Unknown")
-        print("SPI Flash manufacturer: {}".format(man_str))
+        print("SPI Flash manufacturer: {}".format(man_str), flush=True)
         if man_id == MAN_ID_ATMEL:
             spi.transfer([CMD_WRITE_ENABLE], 0)
             spi.transfer([CMD_WRITE_STATUS_BYTE1, 0], 0)
             spi.transfer([CMD_WRITE_DISABLE], 0)
-            print("Software write protect is disabled")
+            print("Software write protect is disabled", flush=True)
 
 
 def main():
@@ -273,19 +273,19 @@ def main():
 
     unlock_write_protect(tty)
 
-    print("Writing to flash...")
+    print("Writing to flash...", flush=True)
     write_bin_to_flash(tty, file_name)
 
-    print("Checking...")
+    print("Checking...", flush=True)
     checking_succeeded = check_file(tty, file_name, args.count)
 
     send_cmd(tty, "cache 0")
 
     if checking_succeeded:
-        print("Checking succeeded")
+        print("Checking succeeded", flush=True)
         sys.exit(0)
     else:
-        eprint("Checking failed")
+        eprint("Checking failed", flush=True)
         sys.exit(1)
 
 
